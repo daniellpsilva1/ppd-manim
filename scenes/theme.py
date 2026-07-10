@@ -1,33 +1,68 @@
-"""Shared broadcast-style theme for PPD Manim visualizations."""
+"""Shared broadcast-style theme for PPD Manim visualizations.
+
+Colors and fonts are sourced from courtviz integration artifacts
+(@ppd/tokens). Regenerate via: pnpm --filter @ppd/tokens build
+"""
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
 from manim import *
-import numpy as np
 
-# ── Fonts (ship with macOS) ──
-FONT_BOLD = "Avenir Next Condensed Demi Bold"
-FONT_HEAVY = "Avenir Next Condensed Heavy"
-FONT_REG = "Avenir Next"
+# Import generated token constants
+_INTEGRATION = Path(__file__).resolve().parents[2] / "courtviz" / "integration" / "python"
+if str(_INTEGRATION) not in sys.path:
+    sys.path.insert(0, str(_INTEGRATION))
 
-# ── Colors ──
-HOST_COLOR = "#29B6F6"      # bright cyan
-GUEST_COLOR = "#FF7043"     # warm orange
-GOLD = "#FFD700"
-BG_TOP = "#0D1B2A"          # deep navy
-BG_BOTTOM = "#1B263B"       # lighter navy
+try:
+    from style_generated import (  # type: ignore[import-not-found]
+        ACCENT,
+        BG_COLOR,
+        BODY_FONT,
+        DISPLAY_FONT,
+        INK,
+        INK_MUTED,
+        PLAYER_GUEST,
+        PLAYER_HOST,
+        PRIMARY_BRIGHT,
+    )
+except ImportError:
+    # Fallback if integration artifacts not yet built
+    BG_COLOR = "#0F172A"
+    INK = "#F2F5FA"
+    INK_MUTED = "#9AA7BD"
+    PRIMARY_BRIGHT = "#3B82F6"
+    ACCENT = "#10B981"
+    PLAYER_HOST = "#3B82F6"
+    PLAYER_GUEST = "#F97316"
+    DISPLAY_FONT = "Barlow Condensed"
+    BODY_FONT = "Inter"
+
+# ── Fonts ──
+FONT_BOLD = DISPLAY_FONT
+FONT_HEAVY = DISPLAY_FONT
+FONT_REG = BODY_FONT
+
+# ── Colors (mapped from @ppd/tokens) ──
+HOST_COLOR = PLAYER_HOST
+GUEST_COLOR = PLAYER_GUEST
+GOLD = ACCENT
+BG_TOP = BG_COLOR
+BG_BOTTOM = "#1B263B"
 PANEL_BG = "#162236"
-TEXT_PRIMARY = "#F0F0F0"
-TEXT_SECONDARY = "#90A4AE"
-GRID_COLOR = "#2C3E50"
+TEXT_PRIMARY = INK
+TEXT_SECONDARY = INK_MUTED
+GRID_COLOR = "#2A3550"
+ACCENT_BLUE = PRIMARY_BRIGHT
 
 # ── Helpers ──
 
 def make_background():
     """Navy gradient backdrop with subtle vignette."""
-    # Main gradient (simulated with stacked rectangles)
     bg = Rectangle(width=16, height=9, fill_color=BG_BOTTOM, fill_opacity=1, stroke_width=0)
-    # Darker top band
     top_band = Rectangle(width=16, height=4.5, fill_color=BG_TOP, fill_opacity=0.7, stroke_width=0)
     top_band.to_edge(UP, buff=0)
-    # Vignette - darker edges
     vignette = Rectangle(width=16, height=9, fill_color="#000000", fill_opacity=0.15, stroke_width=0)
     return VGroup(bg, top_band)
 
